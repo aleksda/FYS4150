@@ -1,5 +1,5 @@
-import os
-os.chdir('/home/aleksandar/Desktop/FYS4150/Project1/')
+import os	# Change dir to previous directory
+os.chdir('../Desktop/FYS4150/Project1/')
 
 import numpy as np, pandas as pd, matplotlib.pyplot as plt, seaborn as sns
 sns.set()#, plt.style.use("bmh")
@@ -23,5 +23,6 @@ for i in range(1,4):
 plt.legend(loc="best")
 plt.xlabel('$x$')
 plt.ylabel('$u(x)$')
+plt.savefig('figures/plot.pdf')
 plt.show()
 

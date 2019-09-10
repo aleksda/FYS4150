@@ -14,6 +14,7 @@ LIBS += -larmadillo -lblas -llapack
 
 SOURCES += \
     main.cpp \
+    test_proj1.cpp
     project1b.cpp
     project1c.cpp
 
@@ -21,4 +22,5 @@ HEADERS += \
     project1b.h \
     project1c.h \
     project1e.h \
-    project1d.h
+    project1d.h \
+    test_proj1.h

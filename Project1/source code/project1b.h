@@ -7,7 +7,7 @@
 #include <iomanip>
 #include <cmath>
 #include <string>
-/*
+
 using namespace std;
 
 ofstream static ofile;
@@ -111,12 +111,12 @@ int project1b(string fn, int ex) {
     }
     return 0;
 }
-*/
+
 
 //inline double f(double x);
 //inline double u(double x);
 
-int project1b(string fn, int ex);
+//int project1b(string fn, int ex);
 
 
 #endif // PROJECT1B_H

@@ -1,7 +1,8 @@
 //# include "project1b.h"
 //# include "project1c.h"
-# include "project1d.h"
+//# include "project1d.h"
 //# include "project1e.h"
+# include "test_proj1.h"
 # include <armadillo>
 # include <iostream>
 # include <string>
@@ -30,8 +31,10 @@ int main(int argc, char* argv[]){
     }
     //project1b(fn, exponent);
     //project1c(filename, exponent);
-    project1d(filename, exponent);
+    //project1d(filename, exponent);
     //project1e(filename, exponent);
+
+    test_proj1();
 
     return 0;
 }
