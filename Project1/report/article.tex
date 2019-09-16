@@ -8,6 +8,7 @@
 \usepackage[]{listings}
 \usepackage[T1]{fontenc}
 \usepackage{color}
+\usepackage{float}
 
 \lstset{
   backgroundcolor=\color{white}, % requires \usepackage{color} or \usepackage{xcolor}
@@ -54,16 +55,6 @@ The objective of this project is to solve the one dimensional version of the Poi
 
 \end{abstract}
 \tableofcontents
-
-\iffalse
-\begin{figure}[h!]
-\centering
-\includegraphics[scale=1.7]{universe}
-\caption{The Universe}
-\label{fig:universe}
-\end{figure}
-\fi
-\newpage
 
 \section{Introduction}
 As they say " the language of physics is math" , this could not ring anymore true, since all the problems we have in physics can be broken down to some form of a mathematical equation(s). In particular differential equations is more widely used to explain the physical world. They say something about how the rates of changes in a given system occurs. The advances in technology have made it possible for us to solve these equations with incredible power, as the analytic solutions can have their limitations. These forms of solutions is also known as numerical solutions, an can be solves within seconds using a computer. \\
@@ -275,13 +266,11 @@ Into two steps:
 The lower triangular equation ${L}\textbf{y} = \textbf{w}$ can be solved by forward substitution, and the other equation {U}\textbf{x} = \textbf{y} with backward substitution.\\
 
 
-The approach for numerical simulations is to solve Eq. \eqref{system} with the three different algorithms. We also studied the relative error of the algorithms as function of $n$ by using Eq. \eqref{calc_deviation}. Further we compared the runtimes of the different algorithms.
 
-$$-u''(x) = f(x)$$
 
 \section{Analysis}
 When we tested the algorithms, it was noticeable that the specialized tridiagonal matrix algorithm was the most efficient one in terms of speed. Bellow in Figure \ref{fig:time} is a plot of the speed for the specialized TMA algorithm and the LU algorithm with $n=10,100,1000,1000$ computations.
-\begin{figure}[h!]
+\begin{figure}[H]
 \centering
 %\includegraphics[scale=1.7]{time.jpg}
  \includegraphics{time.jpg}
@@ -293,7 +282,7 @@ The LU algorithm was slower already from $n=10$, but at $n=1000$ the time it too
 \newline\newline
 Now, using our algorithms to see how well they compare against the analytical solution. Bellow Figure \ref{fig:plot} is a plot for exactly that. 
 
-\begin{figure}[h!]
+\begin{figure}[H]
 \centering
 %\includegraphics[scale=1.7]{plot.png}
 \includegraphics{plot.jpg}
@@ -304,7 +293,7 @@ Now, using our algorithms to see how well they compare against the analytical so
 We see that the plot is from $u(0)=u(1)=0$ as was originally our problem. From the plot, it is noticeable that the numerical solution is a little inaccurate for $n=10$. However, this inaccuracy is bearly noticeable for $n=100$, and unnoticeable for $n=100$. Overall, the results seem very good.
 \newline\newline
 We also have a plot of the maximum relative error for the TDA algorithm in figure \ref{fig:error}. 
-\begin{figure}[h!]
+\begin{figure}[H]
 \centering
 %\includegraphics[scale=1.7]{error.png}
 \includegraphics{error.jpg}
@@ -315,7 +304,7 @@ We also have a plot of the maximum relative error for the TDA algorithm in figur
 The important part to observe here is that the error is falling with the step size until it reaches a point. After that, further falling of the step size will result in the error growing. It is uncertain why this happens. My theory is that this is happening because of loss in numerical precision when representing small values.
 
 \section{Conclusion}
-In this project we have solved the one-dimensional equation of Poisson's equation with Dirichlet boundary conditions. The function was discretized in order to make the non-linear equation solvable using linear algebraic methods. Algorithms has been programmed to solve for both the general tridiagonal matrix and the specific one for our case. For the general we had 8n FLOPs while the special case had 4(n) FLOPs, since the speed of the algorithm is proportional to the amount of FLOPs. The special one saw an increase of two times the speed of the general one. The LU decomposition method proved to be a much less preferable alternative, considering its FLOPs to be {3/2n^3}. This takes up lots of memory and time to run , which is not an ideal scenario for us looking for efficient algorithms.
+In this project we have solved the one-dimensional equation of Poisson's equation with Dirichlet boundary conditions. The function was discretized in order to make the non-linear equation solvable using linear algebraic methods. Algorithms has been programmed to solve for both the general tridiagonal matrix and the specific one for our case. For the general we had 8n FLOPs while the special case had 4(n) FLOPs, since the speed of the algorithm is proportional to the amount of FLOPs. The special one saw an increase of two times the speed of the general one. The LU decomposition method proved to be a much less preferable alternative, considering its FLOPs to be {3/2n^3}.$ This takes up lots of memory and time to run , which is not an ideal scenario for us looking for efficient algorithms.$
 
 
 \citep{CompFys2015MHJ}
