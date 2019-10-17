@@ -1,0 +1,10 @@
+#include "data_to_file.h"
+
+#include<string>
+
+string data_to_file(double d, int n) {
+    (int) 
+    cout << 
+            
+            
+}
