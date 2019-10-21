@@ -1,6 +1,8 @@
+#include "g_legendre.h"
+#include "g_laguerre.h"
+
 #include <iostream>
-#include <g_legendre.h>
-#include <g_laguerre.h>
+
 
 using namespace std;
 
