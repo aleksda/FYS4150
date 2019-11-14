@@ -23,7 +23,7 @@ IsingModel::IsingModel(int size, int data, string filename) {
     int num_of_spins = size * size;
     int E, M = 0;
 
-	// vectors & matrices
+    // vectors & matrices
     spins = Mat<int>(size, size); // Mat<> before spins not working?
     index = Col<int>(size + 2); // FILL WITH ARMA ?
 
@@ -53,6 +53,7 @@ IsingModel::IsingModel(int size, int data, string filename) {
 
 void IsingModel::initialize_random() {
 
+    //spins.randu()(); // Not working?
     int pm_one = 0;
 
     for(unsigned int i = 0; i < this->size; i++) {
@@ -65,8 +66,7 @@ void IsingModel::initialize_random() {
 }
 
 void IsingModel::initialize_up() {
-    //spins.ones();
-    spins.randn();
+    spins.ones();
 }
 
 // Not part of project
@@ -87,21 +87,21 @@ void IsingModel::get_lattice_to_file(ofstream& file) {
 double IsingModel::find_energy() {
     int energy = 0;
     for (unsigned int i = 0; i < this->size; i++) {
-    	for (unsigned int j= 0; j < this->size; j++) {
-    		energy -= spins(i, j) * (spins(index(i+1), index(j)) \
-				+ spins(index(i), index(j+1)));
-      	}
+        for (unsigned int j= 0; j < this->size; j++) {
+            energy -= spins(i, j) * (spins(index(i+1), index(j)) \
+                + spins(index(i), index(j+1)));
+        }
     }
-    
-	return energy;
+
+    return energy;
 }
 
 // Calculates the total magnetization of given system
 double IsingModel::find_magnetization() {
     int magnetization = 0;
     for (unsigned int i = 0; i < this->size; i++) {
-    	for (unsigned int j = 0; j < this->size; j++)
-    	    magnetization += spins(i, j);
+        for (unsigned int j = 0; j < this->size; j++)
+            magnetization += spins(i, j);
     }
 
     return magnetization;
@@ -121,22 +121,22 @@ int IsingModel::get_site_energy(int x, int y) {
 // Metropolis-Hastings Algorithm
 double IsingModel::metropolis() {
 /*
-	int delta_E;
-	int rand_x; int rand_y;
+    int delta_E;
+    int rand_x; int rand_y;
 
-	for(int i = 0; i < num_of_spins; i++) {
-		rand_x = rand() % (size-1); rand_y = rand() % (size-1);
+    for(int i = 0; i < num_of_spins; i++) {
+        rand_x = rand() % (size-1); rand_y = rand() % (size-1);
 
-		delta_E = get_site_energy(rand_y, rand_x);
+        delta_E = get_site_energy(rand_y, rand_x);
 
-		if(delta_E < 0 || (double) rand() <= boltzmann(delta_E + 8)) {
-			
-			E += delta_E;
-			M -= 2 * spins(index(rand_y), index(rand_x));
-			
-			spins(index(rand_y), index(rand_x)) *= 1; // Declare it above the loop?
-		}
-		
+        if(delta_E < 0 || (double) rand() <= boltzmann(delta_E + 8)) {
+
+            E += delta_E;
+            M -= 2 * spins(index(rand_y), index(rand_x));
+
+            spins(index(rand_y), index(rand_x)) *= 1; // Declare it above the loop?
+        }
+
     }*/
     // DEL ALL THIS
     int delta_E;
@@ -188,49 +188,50 @@ void IsingModel::equilibrate(double temp, int num_of_mc_cycles) { // Better name
 
 void IsingModel::simulate(double temp, int num_of_mc_cycles, bool to_file) {
 
-	E = find_energy(); M = find_magnetization();
+    E = find_energy(); M = find_magnetization();
 
-	int denominator = num_of_mc_cycles / this->data;
-	double beta = 1.0 / temp;
+    int denominator = num_of_mc_cycles / this->data;
+    double beta = 1.0 / temp;
 /*
     if(to_file)
         simulate_to_file(temp);
 */
-    stream << fixed << setprecision(4) << temp;
+    //if(to_file) {
+        stream << fixed << setprecision(4) << temp;
 
-    //ofile_spin.open("data/" + this->filename + "_" + stream.str() + "_spin.txt");
-    ofstream ofile_spin("/data/" + this->filename + "_" + stream.str() + "_spin.txt");
-    if (!ofile_spin.is_open())
-       cout << "Could not open spins file" << endl;
+        //ofile_spin.open("data/" + this->filename + "_" + stream.str() + "_spin.txt");
+        ofstream ofile_spin(this->filename + "_" + stream.str() + "_spin.txt");
+        if (!ofile_spin.is_open())
+           cout << "Could not open spins file" << endl;
 
-    //oflie_expect.open("data/" + this->filename + "_" + stream.str() + "_expect.txt");
-    ofstream oflie_expect("/data/" + this->filename + "_" + stream.str() + "_expect.txt");
-    if (!oflie_expect.is_open())
-       cout << "Could not open expect file" << endl;
+        //oflie_expect.open("data/" + this->filename + "_" + stream.str() + "_expect.txt");
+        ofstream oflie_expect(this->filename + "_" + stream.str() + "_expect.txt");
+        if (!oflie_expect.is_open())
+           cout << "Could not open expect file" << endl;
 
-    //ofile_energy.open("data/" + this->filename + "_" + stream.str() + "_energy.txt");
-    ofstream ofile_energy(this->filename + "_" + stream.str() + "_energy.txt");
-    if (!ofile_energy.is_open())
-       cout << "Could not open energy file" << endl;
+        //ofile_energy.open("data/" + this->filename + "_" + stream.str() + "_energy.txt");
+        ofstream ofile_energy(this->filename + "_" + stream.str() + "_energy.txt");
+        if (!ofile_energy.is_open())
+           cout << "Could not open energy file" << endl;
 
-	// Trick for reducing the FLOPs a little during computation
-  	int size_squared 		 = size * size;	// Alternativly use num_of_spins
-  	int size_squared_squared = size_squared * size_squared;
+        get_lattice_to_file(ofile_spin);
+    //}
 
-	double EE = E * E; double MM = M * M;
+    // Trick for reducing the FLOPs a little during computation
+    int size_squared 		 = size * size;	// Alternativly use num_of_spins
+    int size_squared_squared = size_squared * size_squared;
 
-	// MAKE THIS IN A FOR LOOP
-	boltzmann(0)  = 	exp(8.0 * beta);	// -8 +8
-	boltzmann(4)  = 	exp(4.0 * beta);	// -4 +8
-	boltzmann(8)  = 	1;					//  0 +8
-	boltzmann(12) = 	exp(-4.0 * beta);	//  4 +8
-	boltzmann(16) = 	exp(-8.0 * beta);	//  8 +8
+    double EE = E * E; double MM = M * M;
 
-    //write spins to file before we start, so we know initial configuration
-    //write_spinns(ofile_spins);
+    // MAKE THIS IN A FOR LOOP
+    boltzmann(0)  = 	exp(8.0 * beta);	// -8 +8
+    boltzmann(4)  = 	exp(4.0 * beta);	// -4 +8
+    boltzmann(8)  = 	1;					//  0 +8
+    boltzmann(12) = 	exp(-4.0 * beta);	//  4 +8
+    boltzmann(16) = 	exp(-8.0 * beta);	//  8 +8
 
-	int cycle;
-	for (cycle = 0; cycle <= num_of_mc_cycles; cycle++) {
+    int cycle;
+    for (cycle = 0; cycle <= num_of_mc_cycles; cycle++) {
 
         metropolis();
 
@@ -244,21 +245,23 @@ void IsingModel::simulate(double temp, int num_of_mc_cycles, bool to_file) {
 
         if ( (cycle) % denominator == 0) {
             cout << cycle << endl;
-            //if(to_file) {
+            if(to_file) {
                 ofile_energy << E << "\n";
                 get_lattice_to_file(ofile_spin);
                 //get_exp_to_file(cycle + 1, outfile_expect);
-            //}
+            }
         }
     }
 }
 
 void IsingModel::reset_expectations() {
-
+/*
   exp_value(0) = 0; exp_value(1) = 0;
   exp_value(2) = 0; exp_value(3) = 0;
   exp_value(4) = 0;
-
+*/
+    for(int i = 0; i <= 4; i++)
+        exp_value(i) = 0;
 }
 
 void IsingModel::simulate_to_file(double temp) {

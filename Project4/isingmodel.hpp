@@ -22,8 +22,8 @@ class IsingModel {
         Mat<int> spins;
         Col<int> index;
 
-		vec boltzmann;	// Arma
-		vec exp_value;	// Arma
+        vec boltzmann;	// Arma
+        vec exp_value;	// Arma
 
 
 
@@ -40,8 +40,8 @@ class IsingModel {
         void get_lattice();
         void get_lattice_to_file(ofstream& file);
 
-		double find_energy();
-		double find_magnetization();
+        double find_energy();
+        double find_magnetization();
 
         int get_site_energy(int x, int y);
 
