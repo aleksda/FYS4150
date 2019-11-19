@@ -1,0 +1,324 @@
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{dsfont}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}% Include figure files
+\usepackage{dcolumn}% Align table columns on decimal point
+\usepackage{bm}% bold math
+\usepackage{amsmath}
+\usepackage{varioref}
+\usepackage{booktabs}
+\usepackage[bottom]{footmisc}
+
+\usepackage{wasysym}
+
+\usepackage{physics}
+
+\usepackage{algpseudocode}
+\usepackage{listings}
+
+\usepackage{booktabs}
+
+\usepackage{tikz}
+
+\newcommand{\RN}[1]{%
+  \textup{\uppercase\expandafter{\romannumeral#1}}%
+}
+
+
+
+\usepackage[utf8]{inputenc}
+
+\usepackage{natbib}
+\usepackage{graphicx}
+\usepackage[]{hyperref}
+\usepackage[]{physics}
+\usepackage[]{listings}
+\usepackage[T1]{fontenc}
+\usepackage{color}
+\usepackage{float}
+\usepackage{soul}
+\lstset{
+  backgroundcolor=\color{white}, % requires \usepackage{color} or \usepackage{xcolor}
+  basicstyle=\footnotesize,
+  breakatwhitespace=false,
+  breaklines=true,
+  captionpos=b,
+  commentstyle=\color{green},
+  deletekeywords={...},
+  escapeinside={\%*}{*)},
+  extendedchars=true,
+  frame=single,
+  keepspaces=true,
+  keywordstyle=\color{blue},
+  language=c++,
+  otherkeywords={*,...},
+  rulecolor=\color{black},
+  showspaces=false,
+  showstringspaces=false,
+  showtabs=false,
+  stepnumber=2,
+  %stringstyle=\color{pink},
+  tabsize=4,
+}
+
+\title{The Ising model and the Metropolis algorithm}
+\author{
+  Brandt, Samuel\\
+ % \texttt{}
+  \and
+  Davidov, Aleksandar\\
+  \textcolor{blue}{\href{https://github.com/aleksda/FYS4150/}{\texttt{github.com/aleksda}}}
+  \and
+  Hemaz, Said\\
+  % \texttt{first2.last2@xxxxx.com}
+}
+\date{November 2019}
+
+\begin{document}
+
+\maketitle
+
+\section{Abstract}
+
+The goal of this project is to compute the Curie temperature  $T_c$ as the system undergoes phase transition, with the help of the Ising Model and the Metropolis algorithm. Through the calculation of a specific lattice with the following parameters: energy $E$, absolute magnetization  $|M|$, heat capacity   $C_V$ and suceptiblility  $\chi$, the analytical and numeric values where in good correspondence , given the right amount of Monte-Carlo cycles.
+\newpage
+\tableofcontents
+\newpage
+\section{Introduction}
+
+In this project we will study a model that simulates phase transitions , which is known as the Ising model. This is a mathematical model in statistical mechanics used to simulate the magnetic properties of a material at a given temperature.\\\
+
+We will be using the Ising model to simulate a two-dimensional ferromagnetic material. At a critical temperature , the Ising model will show a phase transition from a magnetic state to a non-magnetic state. This is then a binary system that holds only two values, in our case it will be spin up or spin down, which is represented as 1 or -1 in the lattice-matrix. Starting from this two dimensional lattice we will begin with describing the theory of the Ising model, and the workings of our algorithm of choice , the Metropolis-Hastings algorithm. Then we find the analytical expressions of partition function and the expectations values for  $E$ (energy), $|M|$ (magnetic moment),  $C_V$(specific heat capacity) and  $\chi$ (magnetic susceptibility) with respect to the temperature $T$, using periodic boundary conditions. These results will be used in the numerical computations to uncover the critical temperature, with the help of parallelization . At last the results will be discussed.
+
+\section{Theory}
+
+\subsection{The Ising model }\label{const_mot}
+
+The Ising model consists of discrete variables that describe magnetic dipole moments in terms of spin up or spin down. In our simplified version, the Hamiltonian of a  two dimensional  model is given by the equation:
+\begin{equation}\label{eq:Hamiltonian}
+H = -J\sum_{\langle ij \rangle}S^z_i S^z_j,
+\end{equation}
+where $\langle ij \rangle$ denotes a sum over the nearest neighbours of each spin. $J$ is the coupling constant that describes the interaction between the neighbouring spins. We will assume $J$ to be positive , in other words that we have a state of ferromagnetic ordering , which means the the neighbouring spins are aligned. This is because the energy will be lower 
+The two dimensional Ising model on an infinite square lattice is  analytically solved, by L. Onsager . The critical temperature was calculated to be
+\begin{equation}
+k_B T_C / J = \frac{2}{\ln (1 + \sqrt{2})} \approx 2.2692.
+\end{equation}
+
+\subsection{Analytical expressions}\label{const_mot}
+
+First we start of by calculating the partition function, since it  is needed to get analytical expressions for physical values like the susceptibility and heat capacity. For a $2 \times 2$ lattice with periodic boundary conditions, the possible energies and magnetizations are listed with the degeneracies in Table \ref{table:2times2}. 
+
+% Please add the following required packages to your document preamble:
+% \usepackage{booktabs}
+\begin{table}[]
+\caption{The number of spins pointing up on a $2\times 2$ lattice with corresponding degeneracies, energies and magnetizations. The energies are calculated with periodic boundary conditions.} 
+\label{table:2times2}
+\begin{tabular}{@{}cccc@{}}
+\toprule
+$\quad$\ spins$\quad$ & deg. & $E [J]$   & $M$  \\ \midrule
+$4$     & $\qquad 1\qquad$  & $\quad-8\quad$ & $4$  \\
+$3$     & $4$  & $0$   & $2$  \\
+$2$     & $4$  & $0$   & $0$  \\
+$2$     & $2$  & $+8$ & $0$  \\
+$1$     & $4$  & $0$   & $-2$ \\
+$0$     & $1$  & $-8$ & $\qquad -4\qquad$ \\ \bottomrule
+\end{tabular}
+\end{table}
+
+The energy is calculated from Eq.(1), and the magnetization is the sum of all the spins in the following equation,
+\begin{equation}
+M = \sum_{i = 1}^{N} S^z_i,
+\end{equation}
+where $N$ is the total number of spins.
+
+With the help of \ref{table:2times2}, we can calculate the mean energy $\ev{E}$, mean energy squared $\ev{E^2}$,(absolute) magnetization $\ev{\abs{M}}$ and  $\ev{M^2}$. The thermal average of a physical quantity is given by
+\begin{equation}
+\ev{A} = \frac{1}{Z} \sum_i A_i e^{-\beta E_i},
+\end{equation}
+where $i$ is the number of micro states, $\beta = 1/k_B T$ and $Z$ is the partition function, which in our case of $2 \times 2$ lattice is,
+\begin{equation}
+Z = \sum_i e^{-\beta E_i} = 4\left(3 + \cosh (8\beta J)\right).
+\end{equation}
+
+We then get
+\begin{align}\label{eq:expvals}
+\ev{E} &= \frac{1}{Z} \sum_i E_i e^{-\beta E_i} = -\frac{1}{Z}32J\sinh (8\beta J),\\
+\ev{E^2} &= \frac{1}{Z} \sum_i E_i^2 e^{-\beta E_i} = \frac{1}{Z}256J^2\cosh (8\beta J),\\
+\ev{\abs{M}} &= \frac{1}{Z} \sum_i \abs{M_i} e^{-\beta E_i} = \frac{1}{Z}8\left(2 + e^{8\beta J}\right),\\
+\ev{M^2} &= \frac{1}{Z} \sum_i M_i^2 e^{-\beta E_i} = \frac{1}{Z}32\left( 1 + e^{8\beta J}\right).
+\end{align}
+
+From these expectation values, we can calculate the heat capacity at constant volume and the susceptibility of the system from the following relations  \cite{hjorten}:
+\begin{equation}\label{eq:heatcap}
+C_V(T) = \frac{1}{k_BT^2}\left(\ev{E(T)^2} - \ev{E(T)}^2\right),
+\end{equation}
+\begin{equation}\label{eq:suscept}
+\chi(T) = \frac{1}{k_B T}\left(\ev{M(T)^2} - \ev{M(T)}^2\right).
+\end{equation}
+
+\subsection{Phase transitions }\label{const_mot}
+
+Phase transitions takes place  in the critical point, which is marked by the critical temperature $T_C$. The material then goes from being a ordered ferromagnetic material to a disordered paramagnetic material. 
+
+The behaviour around the critical temperature can be connected to the thermodynamical  potential of  Helmholtz' free energy
+
+\begin{equation}
+
+    F = \langle E \rangle - TS = - k_B TlnZ
+
+\end{equation}
+
+where Z is the partition function , T is the temperature, $k_B$ is the Boltzmann constant and S is the entropy. For simplification  $k_B $ will be set to one.  This equation shows the struggle between energy minimization and the maximizing of entropy. For our two dimensional system, the desired outcome would be a minimzation of the energy. In this case, the minimal energy state is the ordered ferromagnetic state and also the the state of minimal chaos, hence minimal entropy.  \newline
+
+The specific heat $C_V$ is defined via the second derivative of F: $C_V = - \frac{1}{k_B T^2}\frac{\partial^2(\beta F)}{\partial \beta ^2}$, where $\beta = \frac{1}{k_B T}$. Since the heat capacity and also the magnetic susceptibility  $\chi$  diverges, the Ising model shows a second order phase transition. The same applies for the magnetic . Since both these magnitudes are temperature dependent , we also expect them to be affected when we reach $T_C$. \newline
+
+
+
+
+\section{Algorithms}
+
+\subsection{Monte-Carlo methods }\label{const_mot}
+Monte Carlo (MC) simulations has their basis on Markov chains, where the configuration evolves over time by multiplications of a stochastic matrix, and converges towards a steady-state.
+
+MC simulations utilizes probability distribution , which in our case is Boltzmann statistics. In order to find all the probabilities, the partition function has to be calculated , which takes a lot  of computer power , especially as the number of lattice points increase. This is where the Metropolis algorithm becomes useful, because the algorithm only takes in account the ratios between the probabilities , in this case the partition function cancels out and we only have to compute the Boltzmann factor.
+
+\subsection{The Metropolis algorithm}\label{const_mot}
+
+The Metropolis algorithm calculates the change in energy, $\Delta E$, using this formula:
+
+\begin{equation}
+\Delta E = 2JS^1_l\sum_{\langle k \rangle}S_k,
+\end{equation}
+where $S^1_l$ is the value of the spin \textit{before} it is flipped and $S_k$ are the neighbour spins. 
+
+
+
+
+
+
+The Metropolis-Hastings algorithm can be broken down to the following steps.
+\begin{enumerate}
+\item The system is initialised by an initial state of energy $E_0$ and magnetization $M_0$ which can be  generated randomly. 
+\item The initial system is changed by flipping the spin of a random site. One then calculates the energy of this new state $E_{new}$.
+\item The difference in energy between the two states $\Delta E =  E_{new} -E_0$ is calculated. Since we only take into account the closest neighbour interactions, there are only five  possible values for $\Delta E$ when one spin is flipped. These are listed in the table above. This means, we can spare a lot of FLOPS by simply precalculating the factor  $e^{-\beta\Delta E}$  for each temperature  
+\item If $ \Delta E < 0$ the new configuration is accepted, meaning that the energy has  lowered , and the system is moving towards an energy minimum. Note that the current value  for energy and magnetization is updated. We therefore have to update the expectation values for $E$, $E^2$, $M$, $M^2$ and $\abs{M}$, before the next MC cycle repeats.
+\item If $ \Delta E > 0$ , compute and compare  $w =   e^{-\beta\Delta E}$  to a random number $r$ $\in$ [0, 1]. If $r < w$ the state is accepted, else the initial state is kept.
+\item The expectation values are updated. And the steps 2-5 will be repeated until a satisfactory good steady state will be reached.
+
+\end{enumerate}
+Other properties of the Metropolis algorithm is that it meets both ergodicity and detailed balance, which are requirements needed for convergence towards equilibrium.
+
+As it takes some time for the configuration to converge towards equilibrium, the results should get better the more MC cycles that is used.
+
+
+
+\section{Code/implementation/ testing}
+\section{Results/Analysis}
+
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = \textwidth]{meanValues.png}
+	\centering
+	\caption{Plot that shows the numerical values Numerical (blue line) - \hl{REDLINE} the expectation value of the energy, absolute value of the magnetization, as well as the heat capacity and susceptibility for a $2\times 2$ lattice as functions of temperature. This was calculated using $10^6$ MC cycles without the system reaching equilibrium.}
+	\label{fig: integration limits Gauss-Legendre}
+\end{figure}
+
+
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = \textwidth]{Ordered.png}
+	\centering
+	\caption{The expectation value of the absolute value of the energy and magnetization as a function of MC cycles for a $20 \times 20$  lattice. The simulation have been done for two different temperatures with and ordered initial condition . Ordered means that all spins starts pointing up ($S^z = 1$)}
+	\label{fig: integration limits Gauss-Legendre}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = \textwidth]{Unordered.png}
+	\centering
+	\caption{The expectation value of the absolute value of the energy and magnetization as a function of MC cycles for a $20 \times 20$ lattice. The simulation have been done for two different temperatures with  initial disordered configuration. Disordered means that all spins starts configuration is chosen randomly}
+	\label{fig: integration limits Gauss-Legendre}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = \textwidth]{}
+	\centering
+	\caption{The percentage of accepted states for different temperatures, calculated with a lattice size $L = 20$. We see that the percentage is low for temperatures below the critical temperature, and increasing rapidly at the critical temperature. For temperatures above the critical temperature it increases slower.}
+	\label{fig: integration limits Gauss-Legendre}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = \textwidth]{acceptedStates.png}
+	\centering
+	\caption{Figure showing that the number of accepted states for a high-temperature system ($T=2.4$) has a proportional relation , while the accepted states for for a lower-temperature system ($T=1$) has a constant relation at equilibrium.}
+	\label{fig: integration limits Gauss-Legendre}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = \textwidth]{probDensity.png}
+	\centering
+	\caption{Probability densities for temperature $T=1$ and temperature $T=2.4$}
+	\label{fig: integration limits Gauss-Legendre}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = \textwidth]{}
+	\centering
+	\caption{The mean energy, magnetisation, specific heat and susceptibility for larger spin lattices}
+	\label{fig: integration limits Gauss-Legendre}
+\end{figure}
+
+\subsection{Paralellization}
+
+
+\section{Discussion}
+
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = \textwidth]{}
+	\centering
+	\caption{{The dots mark the temperatures where the heat capacity peaks (after we applied the Savitzky-Golay filter) for different lattice sizes $L = 40, 60, 80, 100, 120, 200$, which is interpreted as the critical temperature of the system. This is plotted against $1/L$. Using a linear regression \cite{squires} on this data, the critical temperature at $L \to \infty$ can be interpreted as the constant term, which is $T_C(L\to\infty) = 2.2698 \pm  0.0006 J/k_B$. The star shows the analytical value for the critical temperature $T_C = 2.2692J/k_B$ \citep{onsager}}
+	\label{fig: integration limits Gauss-Legendre}
+\end{figure}
+
+
+
+\section{Conclusion}
+
+In this project we have studied the phase transtion of a ferromagnetic material in a  two dimensional square lattice. The Curie temperature was found using Monte Carlo simulations with the Metropolis algorithm. Using the calculated values of 
+
+
+
+
+\begin{equation}
+T_C(L\to\infty) = 2.2698(6)J/k_B,
+\end{equation}
+
+By calculating the heat capacity for different lattice sizes, we could extract the critical temperature by locating the maximum of the heat capacity. Linear regression of the critical temperatures as functions of $1/L$ then gave us a critical temperature for an infinite lattice.
+
+
+
+\begin{thebibliography}{9}
+
+\bibitem{Ising} Ising, E., Beitrag zur Theorie des Ferromagnetismus,
+	\emph{Z. Phys.,} 31, pp. 253-258 (1925).
+\bibitem{hjorten} M. Hjorth-Jensen, Computational Physics Lecture Notes Fall 2019 (2019).
+
+    \bibitem{onsager} L. Onsager, Phys. Rev. \textbf{65}, 117 (1944).
+
+
+\end{thebibliography}
+
+
+\end{document}
